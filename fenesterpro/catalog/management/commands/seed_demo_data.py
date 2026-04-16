@@ -96,4 +96,26 @@ class Command(BaseCommand):
                 if "sash_h_deduction" in len_f:
                     CuttingRuleDeduction.objects.create(rule=cr, variable_name="sash_h_deduction", value=60.0)
 
+        # 8. Cutting Rules for FX
+        if fx.cutting_rules.count() == 0:
+            fx_rules_data = [
+                (profs["TF-01"], "Fixed Top", "1", "width"),
+                (profs["BF-01"], "Fixed Bottom", "1", "width"),
+                (profs["LF-01"], "Fixed Left", "1", "height - frame_deduction"),
+                (profs["RF-01"], "Fixed Right", "1", "height - frame_deduction"),
+                (profs["BD-01"], "Top/Bottom Bead", "2", "width - bead_deduction_w"),
+                (profs["BD-01"], "Left/Right Bead", "2", "height - bead_deduction_h"),
+            ]
+            for profile, p_name, qty_f, len_f in fx_rules_data:
+                cr = CuttingRule.objects.create(
+                    typology=fx, profile=profile, piece_name=p_name,
+                    quantity_formula=qty_f, length_formula=len_f
+                )
+                if "frame_deduction" in len_f:
+                    CuttingRuleDeduction.objects.create(rule=cr, variable_name="frame_deduction", value=45.0)
+                if "bead_deduction_w" in len_f:
+                    CuttingRuleDeduction.objects.create(rule=cr, variable_name="bead_deduction_w", value=100.0)
+                if "bead_deduction_h" in len_f:
+                    CuttingRuleDeduction.objects.create(rule=cr, variable_name="bead_deduction_h", value=145.0)
+
         self.stdout.write(self.style.SUCCESS("Demo data seeded successfully."))
