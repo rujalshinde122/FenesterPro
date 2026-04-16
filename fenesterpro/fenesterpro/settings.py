@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from pathlib import Path
 from decouple import config
 
@@ -58,10 +59,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'fenesterpro.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': config(
+        'DATABASE_URL',
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
+        cast=dj_database_url.parse
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
