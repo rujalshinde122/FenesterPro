@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Quotation - {{ project.project_code }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8pt;
+                font-family: Helvetica, sans-serif;
+            }
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 10pt;
+            color: #333;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: right;
+            border-bottom: 2px solid #1e3a5f;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1e3a5f;
+            margin: 0;
+            font-size: 24pt;
+        }
+        .info-grid {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        .info-grid td {
+            vertical-align: top;
+            width: 50%;
+        }
+        table.data {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        table.data th {
+            background-color: #1e3a5f;
+            color: white;
+            text-align: left;
+            padding: 8px;
+            font-size: 9pt;
+        }
+        table.data td {
+            border-bottom: 1px solid #ddd;
+            padding: 8px;
+            font-size: 9pt;
+        }
+        table.data th.right, table.data td.right {
+            text-align: right;
+        }
+        .totals {
+            width: 50%;
+            float: right;
+        }
+        .totals table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .totals th, .totals td {
+            padding: 5px 8px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+        .totals tr.grand-total th, .totals tr.grand-total td {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e3a5f;
+            border-top: 2px solid #1e3a5f;
+            border-bottom: none;
+            padding-top: 10px;
+        }
+        .footer {
+            clear: both;
+            margin-top: 50px;
+            font-size: 8pt;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PROFORMA QUOTATION</h1>
+        <p><strong>D Sign Design Automation Pvt. Ltd.</strong><br>
+        Industrial Estate, Plot 42<br>
+        GSTIN: 27AADCB7891Q1Z5</p>
+    </div>
+
+    <table class="info-grid">
+        <tr>
+            <td>
+                <strong>To:</strong><br>
+                {{ project.client_name }}<br>
+                {{ project.client_address }}<br>
+                Phone: {{ project.client_phone }}
+            </td>
+            <td>
+                <strong>Project Code:</strong> {{ project.project_code }}<br>
+                <strong>Date:</strong> {% now "jS F Y" %}<br>
+                <strong>System:</strong> {{ project.profile_system.name|default:"-" }}
+            </td>
+        </tr>
+    </table>
+
+    <table class="data">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th class="right">Size (WxH)</th>
+                <th class="right">Qty</th>
+                <th class="right">Unit Rate (Rs)</th>
+                <th class="right">Amount (Rs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.item_code }}</td>
+                <td>{{ item.location }}</td>
+                <td>{{ item.description }}</td>
+                <td class="right">{{ item.width }}x{{ item.height }}</td>
+                <td class="right">{{ item.qty }}</td>
+                <td class="right">{{ item.unit_rate }}</td>
+                <td class="right">{{ item.amount }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No calculated windows available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <table>
+            <tr>
+                <th>Subtotal:</th>
+                <td>Rs {{ subtotal }}</td>
+            </tr>
+            <tr>
+                <th>GST (18%):</th>
+                <td>Rs {{ gst }}</td>
+            </tr>
+            <tr class="grand-total">
+                <th>Grand Total:</th>
+                <td>Rs {{ total }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        <p><strong>Terms & Conditions:</strong><br>
+        1. Validity: 30 days from the date of quotation.<br>
+        2. Payment Terms: 50% advance, balance against delivery.<br>
+        3. Subject to jurisdiction of civil courts.</p>
+    </div>
+</body>
+</html>

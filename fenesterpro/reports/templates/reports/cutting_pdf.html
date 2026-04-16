@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Bar Cutting - {{ project.project_code }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        body { font-family: Helvetica, sans-serif; font-size: 9pt; color: #333; }
+        h1, h2, h3 { color: #1e3a5f; }
+        .bar-container { margin-bottom: 20px; border: 1px solid #cbd5e1; padding: 10px; }
+        .bar-viz { display: flex; width: 100%; height: 25px; background: #f8fafc; border: 1px solid #94a3b8; border-radius: 2px; }
+        .segment { background: #3b82f6; color: white; border-right: 1px solid #1e40af; text-align: center; font-size: 7pt; overflow: hidden; white-space: nowrap; line-height: 25px; }
+        .waste { background: #cbd5e1; flex-grow: 1; text-align: center; color: #64748b; font-size: 7pt; line-height: 25px; }
+        .bar-meta { font-size: 8pt; margin-bottom: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Optimised Bar Layout</h1>
+    <p><strong>Project:</strong> {{ project.project_code }} | <strong>Standard Length:</strong> {{ bar_length }}mm</p>
+    
+    {% if opt_result %}
+        {% for code, p_data in opt_result.profiles.items %}
+            <h3>{{ code }} - {{ p_data.profile_name }} ({{ p_data.bars_used }} bars)</h3>
+            
+            {% for bar in p_data.bar_layouts %}
+                <div class="bar-container">
+                    <div class="bar-meta">Bar #{{ bar.bar_number }} - Used: {{ bar.used_length }}mm, Remains: {{ bar.remaining }}mm</div>
+                    
+                    <!-- Weasyprint doesn't process flexbox perfectly for complex nested inline but a simple block representation works. To ensure PDF safety, we use floated divs or tables -->
+                    <table style="width: 100%; height: 30px; border-spacing: 0; border: 1px solid #000;">
+                        <tr>
+                        {% for piece in bar.pieces %}
+                            <!-- Approximate width percentage for viz -->
+                            <!-- width % = (piece.length / 6000) * 100 -->
+                            <td style="width: {% widthratio piece.length bar_length 100 %}%; background-color: #cbd5e1; border-right: 1px solid #94a3b8; text-align: center; font-size: 8px;">
+                                {{ piece.length|floatformat:0 }}
+                            </td>
+                        {% endfor %}
+                        {% if bar.remaining > 0 %}
+                            <td style="width: {% widthratio bar.remaining bar_length 100 %}%; background: repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 10px, #e2e8f0 10px, #e2e8f0 20px); text-align: center; font-size: 8px; color: #64748b;">
+                                Waste
+                            </td>
+                        {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            {% endfor %}
+            <hr style="border: 0; border-bottom: 1px dashed #cbd5e1; margin: 20px 0;">
+        {% endfor %}
+    {% else %}
+        <p>No optimisation data available. Please run optimisation first.</p>
+    {% endif %}
+</body>
+</html>
