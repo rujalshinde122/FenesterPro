@@ -3,138 +3,100 @@
 {% block title %}Add Window - {{ project.project_code }}{% endblock %}
 
 {% block content %}
-<div class="mt-4 flex justify-center w-full mb-10">
-    <div class="w-full max-w-4xl">
-        <div class="flex items-center gap-4 mb-8">
-            <a href="{% url 'projects:detail' project.pk %}" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-ui-muted hover:text-twisty-500 shadow-soft transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-            </a>
+<section class="max-w-5xl mx-auto">
+    <div class="flex items-center justify-between gap-4 mb-7">
+        <div>
+            <p class="text-xs uppercase tracking-[0.2em] text-brand-red font-extrabold">Window Entry</p>
+            <h1 class="mt-2 text-3xl font-extrabold tracking-tight">Add opening for {{ project.project_code }}</h1>
+        </div>
+        <a href="{% url 'projects:detail' project.pk %}" class="inline-flex px-4 py-2 border border-black/20 text-sm font-bold hover:border-black/40 transition-colors">Back to Project</a>
+    </div>
+
+    <form method="post" class="bg-white border border-black/10 p-6 md:p-8">
+        {% csrf_token %}
+
+        <div class="grid md:grid-cols-2 gap-6">
             <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold text-ui-text tracking-tight mb-1">Add Element Opening</h1>
-                <p class="text-ui-muted text-sm font-medium">Configure dimensions, typologies, and glass for project {{ project.project_code }}.</p>
+                <label class="block text-xs uppercase tracking-[0.14em] font-bold text-ui-muted mb-2">Element Code</label>
+                {{ form.item_code }}
+            </div>
+            <div>
+                <label class="block text-xs uppercase tracking-[0.14em] font-bold text-ui-muted mb-2">Fabrication Typology</label>
+                {{ form.typology }}
             </div>
         </div>
 
-        <div class="bg-ui-surface rounded-4xl shadow-soft p-8 md:p-10 relative overflow-hidden group border border-ui-border">
-            <div class="absolute right-[-10%] bottom-[-10%] w-96 h-96 bg-blue-500/5 rounded-full blur-[80px] -z-10 transition duration-700"></div>
-
-            <form method="post" action="" class="space-y-8 relative z-10">
-                {% csrf_token %}
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
-                    <!-- Left Column: Core Settings -->
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-3 border-b border-ui-border pb-3">
-                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
-                            </div>
-                            <h3 class="text-sm font-bold tracking-widest text-ui-text uppercase">Typology Identifier</h3>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-ui-muted uppercase tracking-wider mb-2">Element Code (e.g., W01)</label>
-                            {{ form.item_code }}
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-ui-muted uppercase tracking-wider mb-2">Fabrication Typology</label>
-                            {{ form.typology }}
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-ui-muted uppercase tracking-wider mb-2">Location / Reference Note</label>
-                            {{ form.location_note }}
-                        </div>
-                    </div>
-
-                    <!-- Right Column: Dimensions -->
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-3 border-b border-ui-border pb-3">
-                            <div class="w-8 h-8 rounded-lg bg-twisty-50 text-twisty-500 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-                            </div>
-                            <h3 class="text-sm font-bold tracking-widest text-ui-text uppercase">Dimensions & Quantity</h3>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-ui-muted uppercase tracking-wider mb-2">Width <span class="lowercase text-slate-400 font-medium">(mm)</span></label>
-                                {{ form.width }}
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-ui-muted uppercase tracking-wider mb-2">Height <span class="lowercase text-slate-400 font-medium">(mm)</span></label>
-                                {{ form.height }}
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-ui-muted uppercase tracking-wider mb-2">Multiplier (Quantity)</label>
-                            {{ form.quantity }}
-                        </div>
-                        
-                        <div class="flex items-center gap-2 mt-4 ml-1">
-                            {{ form.has_mesh }}
-                            <label class="text-sm font-bold text-ui-text cursor-pointer select-none">Include Insect Screen/Mesh Option</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-6 pt-4 border-t border-ui-border">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-xs font-bold text-ui-muted uppercase tracking-wider mb-2">Glass Config</label>
-                            {{ form.glass_type }}
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-ui-muted uppercase tracking-wider mb-2">Frame Surface Finish</label>
-                            {{ form.finish }}
-                        </div>
-                    </div>
-                </div>
-
-                <style>
-                    /* Customizing form fields */
-                    input[type="text"], input[type="number"], select {
-                        width: 100%;
-                        background-color: #f8fafc;
-                        border: 2px solid transparent;
-                        border-radius: 1rem;
-                        padding: 0.875rem 1.25rem;
-                        font-size: 0.875rem;
-                        font-weight: 600;
-                        color: #1a1f36;
-                        transition: all 0.2s ease;
-                    }
-                    input[type="text"]:focus, input[type="number"]:focus, select:focus {
-                        outline: none;
-                        background-color: #ffffff;
-                        border-color: #ff5a36;
-                        box-shadow: 0 0 0 4px rgba(255, 90, 54, 0.1);
-                    }
-                    select {
-                        appearance: none;
-                        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-                        background-repeat: no-repeat;
-                        background-position: right 1rem center;
-                        background-size: 1.2em;
-                        cursor: pointer;
-                    }
-                    input[type="checkbox"] {
-                        width: 1.25rem;
-                        height: 1.25rem;
-                        border-radius: 0.375rem;
-                        border: 2px solid #cbd5e1;
-                        accent-color: #ff5a36;
-                        cursor: pointer;
-                    }
-                </style>
-
-                <div class="pt-8 flex items-center justify-between border-t border-ui-border">
-                    <p class="text-xs font-medium text-ui-muted hidden md:block">Adding this element will reset optimisation state requiring recalculation.</p>
-                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-3.5 bg-twisty-500 text-white rounded-full text-sm font-bold shadow-lg shadow-twisty-500/30 hover:bg-twisty-600 hover:-translate-y-0.5 transition-all outline-none">
-                        Save Element
-                    </button>
-                </div>
-            </form>
+        <div class="mt-6">
+            <label class="block text-xs uppercase tracking-[0.14em] font-bold text-ui-muted mb-2">Location Note</label>
+            {{ form.location_note }}
         </div>
-    </div>
-</div>
+
+        <div class="grid md:grid-cols-3 gap-6 mt-6">
+            <div>
+                <label class="block text-xs uppercase tracking-[0.14em] font-bold text-ui-muted mb-2">Width (mm)</label>
+                {{ form.width }}
+            </div>
+            <div>
+                <label class="block text-xs uppercase tracking-[0.14em] font-bold text-ui-muted mb-2">Height (mm)</label>
+                {{ form.height }}
+            </div>
+            <div>
+                <label class="block text-xs uppercase tracking-[0.14em] font-bold text-ui-muted mb-2">Quantity</label>
+                {{ form.quantity }}
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-6">
+            <div>
+                <label class="block text-xs uppercase tracking-[0.14em] font-bold text-ui-muted mb-2">Glass Type</label>
+                {{ form.glass_type }}
+            </div>
+            <div>
+                <label class="block text-xs uppercase tracking-[0.14em] font-bold text-ui-muted mb-2">Frame Finish</label>
+                {{ form.finish }}
+            </div>
+        </div>
+
+        <div class="mt-6 flex items-center gap-3">
+            {{ form.has_mesh }}
+            <label class="text-sm font-semibold text-ui-text">Include mesh option</label>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-black/10 flex justify-end">
+            <button type="submit" class="inline-flex px-6 py-3 bg-brand-red text-white text-sm font-bold hover:bg-[#b13227] transition-colors">Save Element</button>
+        </div>
+    </form>
+</section>
+
+<style>
+    input[type="text"], input[type="email"], input[type="number"], textarea, select {
+        width: 100%;
+        border: 1px solid #cfcac3;
+        background: #fffcf8;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #16202f;
+    }
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: #d13b2f;
+        box-shadow: 0 0 0 3px rgba(209, 59, 47, 0.12);
+        background: #ffffff;
+    }
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234b5563'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        padding-right: 2.2rem;
+    }
+    input[type="checkbox"] {
+        width: 1.1rem;
+        height: 1.1rem;
+        accent-color: #d13b2f;
+        border: 1px solid #cfcac3;
+    }
+</style>
 {% endblock %}

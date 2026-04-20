@@ -3,88 +3,42 @@
 {% block title %}Reports - FenesterPro{% endblock %}
 
 {% block content %}
-<div class="mt-4">
-    <!-- Header -->
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{% url 'projects:detail' project.pk %}" class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-ui-muted hover:text-twisty-500 shadow-soft transition-all transform hover:-translate-x-1">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-        </a>
-        <div>
-            <h1 class="text-2xl md:text-3xl font-extrabold text-ui-text tracking-tight mb-1">Generated Reports</h1>
-            <p class="text-ui-muted text-sm font-medium">Export ready-to-print PDFs and native Excel workbooks.</p>
-        </div>
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">
+    <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-brand-red font-extrabold">Reports Hub</p>
+        <h1 class="mt-2 text-3xl md:text-4xl font-extrabold tracking-tight">Export documents for {{ project.project_code }}</h1>
+        <p class="mt-2 text-ui-muted">Get printable PDFs and Excel output for quotation, BOQ, and production execution.</p>
     </div>
+    <a href="{% url 'projects:detail' project.pk %}" class="inline-flex w-fit px-4 py-2 border border-black/20 text-sm font-bold hover:border-black/40 transition-colors">Back to Project</a>
+</section>
 
-    <!-- Bento Grid for Reports -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Quotation -->
-        <a href="{% url 'reports:quotation' project.pk %}" class="bg-ui-surface p-8 rounded-4xl shadow-soft group hover:shadow-float border border-transparent hover:border-blue-100 transition-all block relative overflow-hidden">
-            <div class="absolute right-0 bottom-0 w-32 h-32 bg-blue-50 rounded-tl-[100px] -z-10 group-hover:scale-110 transition-transform duration-500"></div>
-            
-            <div class="w-16 h-16 rounded-3xl bg-blue-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            </div>
-            
-            <h3 class="text-2xl font-bold text-ui-text mb-2 tracking-tight">Proforma Quotation</h3>
-            <p class="text-ui-muted text-sm font-medium leading-relaxed mb-6">A commercial offer generated automatically referencing exact glass sizes and extrusions computed.</p>
-            
-            <div class="inline-flex items-center gap-2 text-blue-600 font-bold text-sm bg-white border border-blue-50 rounded-xl px-4 py-2 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
-                View & Save PDF
-                <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            </div>
-        </a>
-        
-        <!-- BOQ -->
-        <a href="{% url 'reports:boq' project.pk %}" class="bg-ui-surface p-8 rounded-4xl shadow-soft group hover:shadow-float border border-transparent hover:border-purple-100 transition-all block relative overflow-hidden">
-            <div class="absolute right-0 bottom-0 w-32 h-32 bg-purple-50 rounded-tl-[100px] -z-10 group-hover:scale-110 transition-transform duration-500"></div>
-            
-            <div class="w-16 h-16 rounded-3xl bg-purple-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            </div>
-            
-            <h3 class="text-2xl font-bold text-ui-text mb-2 tracking-tight">Bill of Quantities</h3>
-            <p class="text-ui-muted text-sm font-medium leading-relaxed mb-6">Grouped total running meters of raw profiles, square meters of glass, and aggregated hardware.</p>
-            
-            <div class="inline-flex items-center gap-2 text-purple-600 font-bold text-sm bg-white border border-purple-50 rounded-xl px-4 py-2 group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
-                View & Save PDF
-                <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4-4m4-4H3"/></svg>
-            </div>
-        </a>
+<section class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <a href="{% url 'reports:quotation' project.pk %}" class="bg-white border border-black/10 p-6 hover:bg-[#fcfaf6] transition-colors">
+        <p class="text-xs uppercase tracking-[0.14em] font-bold text-brand-red">PDF</p>
+        <h2 class="mt-2 text-2xl font-extrabold">Proforma Quotation</h2>
+        <p class="mt-2 text-sm text-ui-muted">Commercial offer sheet based on calculated dimensions and system configuration.</p>
+        <span class="inline-flex mt-5 text-sm font-bold text-brand-red">Open Report</span>
+    </a>
 
-        <!-- Bar Cutting Layout -->
-        <a href="{% url 'reports:cutting' project.pk %}" class="bg-ui-surface p-8 rounded-4xl shadow-soft group hover:shadow-float border border-transparent hover:border-twisty-100 transition-all block relative overflow-hidden {% if not project.optimisation_result %}opacity-60 cursor-not-allowed pointer-events-none filter grayscale{% endif %}">
-            <div class="absolute right-0 bottom-0 w-32 h-32 bg-twisty-50 rounded-tl-[100px] -z-10 group-hover:scale-110 transition-transform duration-500"></div>
-            
-            <div class="w-16 h-16 rounded-3xl bg-twisty-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-twisty-500/30">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-            </div>
-            
-            <h3 class="text-2xl font-bold text-ui-text mb-2 tracking-tight">Workshop Cutting Plan</h3>
-            <p class="text-ui-muted text-sm font-medium leading-relaxed mb-6">Visual mapped guide for sawing the standard profiles down with absolute minimal material loss.</p>
-            
-            <div class="inline-flex items-center gap-2 text-twisty-600 font-bold text-sm bg-white border border-twisty-50 rounded-xl px-4 py-2 group-hover:bg-twisty-500 group-hover:text-white transition-all shadow-sm">
-                {% if not project.optimisation_result %}Run Optimisation First{% else %}View Layout PDF <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>{% endif %}
-            </div>
-        </a>
+    <a href="{% url 'reports:boq' project.pk %}" class="bg-white border border-black/10 p-6 hover:bg-[#fcfaf6] transition-colors">
+        <p class="text-xs uppercase tracking-[0.14em] font-bold text-brand-red">PDF</p>
+        <h2 class="mt-2 text-2xl font-extrabold">Bill Of Quantities</h2>
+        <p class="mt-2 text-sm text-ui-muted">Grouped material totals for profiles, glass area, and fitting requirements.</p>
+        <span class="inline-flex mt-5 text-sm font-bold text-brand-red">Open Report</span>
+    </a>
 
-        <!-- Excel Export -->
-        <a href="{% url 'reports:excel' project.pk %}" class="bg-ui-surface p-8 rounded-4xl shadow-soft group hover:shadow-float border border-transparent hover:border-green-100 transition-all block relative overflow-hidden">
-            <div class="absolute right-0 bottom-0 w-32 h-32 bg-green-50 rounded-tl-[100px] -z-10 group-hover:scale-110 transition-transform duration-500"></div>
-            
-            <div class="w-16 h-16 rounded-3xl bg-[#10b981] text-white flex items-center justify-center mb-6 shadow-lg shadow-green-500/30">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-            </div>
-            
-            <h3 class="text-2xl font-bold text-ui-text mb-2 tracking-tight">Enterprise Export</h3>
-            <p class="text-ui-muted text-sm font-medium leading-relaxed mb-6">Download a structured multi-sheet Excel `.xlsx` containing the complete unadulterated dataset.</p>
-            
-            <div class="inline-flex items-center gap-2 text-green-600 font-bold text-sm bg-white border border-green-50 rounded-xl px-4 py-2 group-hover:bg-[#10b981] group-hover:text-white transition-all shadow-sm">
-                Download XLSX
-                <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            </div>
-        </a>
+    <a href="{% url 'reports:cutting' project.pk %}" class="bg-white border border-black/10 p-6 hover:bg-[#fcfaf6] transition-colors {% if not project.optimisation_result %}opacity-60 pointer-events-none{% endif %}">
+        <p class="text-xs uppercase tracking-[0.14em] font-bold text-brand-red">PDF</p>
+        <h2 class="mt-2 text-2xl font-extrabold">Workshop Cutting Plan</h2>
+        <p class="mt-2 text-sm text-ui-muted">Profile cutting layout from optimization result to reduce wastage.</p>
+        <span class="inline-flex mt-5 text-sm font-bold text-brand-red">{% if not project.optimisation_result %}Run Optimization First{% else %}Open Report{% endif %}</span>
+    </a>
 
-    </div>
-</div>
+    <a href="{% url 'reports:excel' project.pk %}" class="bg-white border border-black/10 p-6 hover:bg-[#fcfaf6] transition-colors">
+        <p class="text-xs uppercase tracking-[0.14em] font-bold text-brand-red">XLSX</p>
+        <h2 class="mt-2 text-2xl font-extrabold">Excel Export</h2>
+        <p class="mt-2 text-sm text-ui-muted">Multi-sheet workbook for project data sharing, checking, and audit records.</p>
+        <span class="inline-flex mt-5 text-sm font-bold text-brand-red">Download</span>
+    </a>
+</section>
 {% endblock %}

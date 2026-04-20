@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FenesterPro | Window Fabrication Software For India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            ink: '#16202f',
+                            red: '#d13b2f',
+                            saffron: '#ee7a1a',
+                            sand: '#f6f1e8',
+                            mint: '#d4efe3'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Manrope"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: #f7f4ee;
+            color: #16202f;
+        }
+        .hero-grid {
+            background-image:
+                linear-gradient(rgba(22, 32, 47, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(22, 32, 47, 0.08) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky top-0 z-40 border-b border-black/5 backdrop-blur bg-[#f7f4ee]/90">
+        <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 flex items-center justify-between">
+            <a href="{% url 'core:landing' %}" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-red text-white flex items-center justify-center shadow-lg shadow-brand-red/30 transform transition hover:rotate-12 duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z" />
+                    </svg>
+                </div>
+                <span class="text-xl font-extrabold tracking-tight">FenesterPro</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold">
+                <a href="#features" class="hover:text-brand-red transition-colors">Features</a>
+                <a href="#workflow" class="hover:text-brand-red transition-colors">Workflow</a>
+                <a href="#pricing" class="hover:text-brand-red transition-colors">Plans</a>
+                <a href="#faq" class="hover:text-brand-red transition-colors">FAQ</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="{% url 'core:dashboard' %}" class="text-sm font-bold px-4 py-2 border border-brand-ink/20 hover:border-brand-ink/40 transition-colors">Dashboard</a>
+                <a href="{% url 'projects:new' %}" class="text-sm font-bold px-4 py-2 bg-brand-red text-white hover:bg-[#b13227] transition-colors">Start Project</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-grid">
+            <div class="max-w-7xl mx-auto px-5 md:px-8 pt-14 pb-20">
+                <div class="grid lg:grid-cols-2 gap-10 items-end">
+                    <div>
+                        <p class="text-xs md:text-sm uppercase tracking-[0.2em] text-brand-red font-extrabold mb-4">Built For Indian Fabricators</p>
+                        <h1 class="text-4xl md:text-6xl font-extrabold leading-tight max-w-2xl">Run your entire window project cycle from enquiry to cutting list.</h1>
+                        <p class="mt-6 text-base md:text-lg text-brand-ink/80 max-w-xl leading-relaxed">
+                            FenesterPro helps uPVC and aluminium teams across India handle quotations, optimize profile cuts, and track project progress in one practical workspace.
+                        </p>
+                        <div class="mt-9 flex flex-wrap items-center gap-3">
+                            <a href="{% url 'projects:new' %}" class="px-6 py-3 bg-brand-ink text-white font-bold hover:bg-black transition-colors">Create Your First Project</a>
+                            <a href="{% url 'core:dashboard' %}" class="px-6 py-3 bg-white border border-black/10 font-bold hover:border-black/30 transition-colors">View Demo Dashboard</a>
+                        </div>
+                        <div class="mt-10 grid grid-cols-3 gap-4 max-w-xl">
+                            <div class="bg-white border border-black/10 p-4">
+                                <p class="text-3xl font-extrabold">{{ total_projects }}</p>
+                                <p class="text-xs uppercase tracking-[0.16em] mt-2 text-brand-ink/65">Projects Managed</p>
+                            </div>
+                            <div class="bg-white border border-black/10 p-4">
+                                <p class="text-3xl font-extrabold">{{ active_projects }}</p>
+                                <p class="text-xs uppercase tracking-[0.16em] mt-2 text-brand-ink/65">In Progress</p>
+                            </div>
+                            <div class="bg-white border border-black/10 p-4">
+                                <p class="text-3xl font-extrabold">{{ profile_systems }}</p>
+                                <p class="text-xs uppercase tracking-[0.16em] mt-2 text-brand-ink/65">Profile Systems</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-ink text-white p-7 md:p-9 relative overflow-hidden">
+                        <div class="absolute -top-20 -right-20 h-48 w-48 rounded-full bg-brand-saffron/20"></div>
+                        <div class="absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-brand-red/30"></div>
+                        <p class="text-xs uppercase tracking-[0.18em] text-white/75 font-bold">Daily Ops Snapshot</p>
+                        <h2 class="mt-3 text-2xl md:text-3xl font-extrabold leading-tight">No spreadsheets, no manual back-and-forth, no missed revisions.</h2>
+                        <div class="mt-8 space-y-4 relative z-10">
+                            <div class="bg-white/10 border border-white/20 p-4">
+                                <p class="font-bold">Project setup in minutes</p>
+                                <p class="text-sm text-white/80 mt-1">Create client projects, choose systems, and add windows with complete dimensions.</p>
+                            </div>
+                            <div class="bg-white/10 border border-white/20 p-4">
+                                <p class="font-bold">Accurate cutting plans</p>
+                                <p class="text-sm text-white/80 mt-1">Use optimized bars and reduce scrap with algorithmic profile planning.</p>
+                            </div>
+                            <div class="bg-white/10 border border-white/20 p-4">
+                                <p class="font-bold">Quotation and BOQ reports</p>
+                                <p class="text-sm text-white/80 mt-1">Generate documents your sales and factory teams can use immediately.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="max-w-7xl mx-auto px-5 md:px-8 py-16">
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="p-7 bg-white border border-black/10">
+                    <p class="text-xs font-extrabold tracking-[0.2em] text-brand-red uppercase">Project Control</p>
+                    <h3 class="mt-3 text-2xl font-extrabold">All project data in one place</h3>
+                    <p class="mt-4 text-brand-ink/75 leading-relaxed">Track client details, site locations, and status updates from draft to completion without jumping between tools.</p>
+                </div>
+                <div class="p-7 bg-brand-mint border border-black/10">
+                    <p class="text-xs font-extrabold tracking-[0.2em] text-brand-ink uppercase">Fabrication Focus</p>
+                    <h3 class="mt-3 text-2xl font-extrabold">Window-first calculation engine</h3>
+                    <p class="mt-4 text-brand-ink/80 leading-relaxed">Add dimensions, glazing rules, and profile systems suited to Indian fabrication workflows and vendor catalogs.</p>
+                </div>
+                <div class="p-7 bg-brand-sand border border-black/10">
+                    <p class="text-xs font-extrabold tracking-[0.2em] text-brand-ink uppercase">Reports Ready</p>
+                    <h3 class="mt-3 text-2xl font-extrabold">Quotation, BOQ, cutting PDF</h3>
+                    <p class="mt-4 text-brand-ink/80 leading-relaxed">Generate practical output documents for customer approvals and factory execution with fewer manual errors.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="bg-white border-y border-black/10">
+            <div class="max-w-7xl mx-auto px-5 md:px-8 py-16">
+                <div class="max-w-3xl">
+                    <p class="text-xs uppercase tracking-[0.2em] text-brand-red font-extrabold">How Teams Use FenesterPro</p>
+                    <h2 class="mt-3 text-3xl md:text-4xl font-extrabold leading-tight">From enquiry call to final report, in a clear flow.</h2>
+                </div>
+                <div class="mt-10 grid md:grid-cols-4 gap-5">
+                    <div class="border border-black/10 p-5">
+                        <p class="text-xs font-black tracking-[0.16em] text-brand-red">Step 01</p>
+                        <h3 class="mt-2 font-extrabold text-lg">Create Project</h3>
+                        <p class="mt-2 text-sm text-brand-ink/75">Capture client name, code, and project scope.</p>
+                    </div>
+                    <div class="border border-black/10 p-5">
+                        <p class="text-xs font-black tracking-[0.16em] text-brand-red">Step 02</p>
+                        <h3 class="mt-2 font-extrabold text-lg">Add Windows</h3>
+                        <p class="mt-2 text-sm text-brand-ink/75">Enter dimensions and system data room by room.</p>
+                    </div>
+                    <div class="border border-black/10 p-5">
+                        <p class="text-xs font-black tracking-[0.16em] text-brand-red">Step 03</p>
+                        <h3 class="mt-2 font-extrabold text-lg">Run Optimization</h3>
+                        <p class="mt-2 text-sm text-brand-ink/75">Get cutting layouts and profile usage instantly.</p>
+                    </div>
+                    <div class="border border-black/10 p-5">
+                        <p class="text-xs font-black tracking-[0.16em] text-brand-red">Step 04</p>
+                        <h3 class="mt-2 font-extrabold text-lg">Share Reports</h3>
+                        <p class="mt-2 text-sm text-brand-ink/75">Download quotation, BOQ, and production-ready sheets.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="max-w-7xl mx-auto px-5 md:px-8 py-16">
+            <div class="grid lg:grid-cols-2 gap-8 items-stretch">
+                <div class="border border-black/10 bg-white p-8">
+                    <p class="text-xs uppercase tracking-[0.2em] text-brand-red font-extrabold">Made For Indian Teams</p>
+                    <h2 class="mt-3 text-3xl font-extrabold leading-tight">Deploy in your office workflow without heavy setup.</h2>
+                    <ul class="mt-6 space-y-3 text-brand-ink/85">
+                        <li>Works for aluminium and uPVC fabrication scenarios.</li>
+                        <li>Supports practical project lifecycle states used by local teams.</li>
+                        <li>Designed for quotation and execution documentation.</li>
+                    </ul>
+                </div>
+                <div class="border border-black/10 bg-brand-ink text-white p-8 flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.2em] text-white/70 font-extrabold">Start Building</p>
+                        <h3 class="mt-3 text-3xl font-extrabold">Launch your next project in minutes.</h3>
+                        <p class="mt-4 text-white/80">Use the live product now to create a project, add windows, and generate reports.</p>
+                    </div>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <a href="{% url 'projects:new' %}" class="px-5 py-3 bg-brand-saffron text-brand-ink font-bold hover:bg-[#f39343] transition-colors">Start New Project</a>
+                        <a href="{% url 'projects:list' %}" class="px-5 py-3 border border-white/30 font-bold hover:border-white/60 transition-colors">Open Project List</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="bg-white border-t border-black/10">
+            <div class="max-w-7xl mx-auto px-5 md:px-8 py-16">
+                <h2 class="text-3xl font-extrabold">FAQ</h2>
+                <div class="mt-8 grid md:grid-cols-2 gap-6">
+                    <div class="border border-black/10 p-6">
+                        <h3 class="font-extrabold text-lg">Can I use this for both quotation and production?</h3>
+                        <p class="mt-2 text-brand-ink/75">Yes. You can create project records, compute entries, optimize cuts, and produce documentation for downstream teams.</p>
+                    </div>
+                    <div class="border border-black/10 p-6">
+                        <h3 class="font-extrabold text-lg">Is this only for very large fabricators?</h3>
+                        <p class="mt-2 text-brand-ink/75">No. The workflow is useful for both growing workshops and larger operations that handle multiple concurrent sites.</p>
+                    </div>
+                    <div class="border border-black/10 p-6">
+                        <h3 class="font-extrabold text-lg">How quickly can I start?</h3>
+                        <p class="mt-2 text-brand-ink/75">Immediately. Create a project, add windows, and generate reports in the same dashboard session.</p>
+                    </div>
+                    <div class="border border-black/10 p-6">
+                        <h3 class="font-extrabold text-lg">Can the team review old projects?</h3>
+                        <p class="mt-2 text-brand-ink/75">Yes. Project history is available through the project list and detail pages for follow-up and revisions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#101722] text-white">
+        <div class="max-w-7xl mx-auto px-5 md:px-8 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div>
+                <p class="text-xl font-extrabold">FenesterPro</p>
+                <p class="text-sm text-white/70 mt-1">Software for window fabrication workflows in India.</p>
+            </div>
+            <div class="flex items-center gap-5 text-sm text-white/80">
+                <a href="{% url 'core:dashboard' %}" class="hover:text-white">Dashboard</a>
+                <a href="{% url 'projects:list' %}" class="hover:text-white">Projects</a>
+                <a href="{% url 'projects:new' %}" class="hover:text-white">New Project</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,49 +1,100 @@
 import uuid
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Project, WindowEntry
-from .forms import ProjectForm, WindowEntryForm
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.utils import timezone
+from .models import Project
+from .forms import ProjectForm, CustomerProjectForm, WindowEntryForm, InvoiceForm
 from calculator.engine import WindowCalculator
 from optimizer.engine import BarOptimiser
 from optimizer.models import OptimisationResult
+from .permissions import is_admin_user, can_access_project
+from reports.generators.quotation import calculate_quotation_totals
 
+
+@login_required
 def project_list(request):
-    projects = Project.objects.all().order_by('-created_at')
-    return render(request, 'projects/project_list.html', {'projects': projects})
+    if is_admin_user(request.user):
+        projects = Project.objects.select_related('customer', 'profile_system').all().order_by('-created_at')
+    else:
+        projects = Project.objects.select_related('customer', 'profile_system').filter(customer=request.user).order_by('-created_at')
+    return render(request, 'projects/project_list.html', {'projects': projects, 'is_admin': is_admin_user(request.user)})
 
+
+@login_required
 def project_create(request):
+    admin_user = is_admin_user(request.user)
+    form_class = ProjectForm if admin_user else CustomerProjectForm
+
     if request.method == 'POST':
-        form = ProjectForm(request.POST)
+        form = form_class(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
             # Generate a simple unique project code
             project.project_code = f"PRJ-{str(uuid.uuid4())[:8].upper()}"
+            project.customer = request.user
+            if not admin_user:
+                project.status = Project.STATUS_PENDING
             project.save()
-            messages.success(request, f"Project {project.project_code} created successfully.")
+            messages.success(request, f"Order request {project.project_code} created successfully.")
             return redirect('projects:detail', pk=project.pk)
     else:
-        form = ProjectForm()
-    return render(request, 'projects/project_form.html', {'form': form})
+        form = form_class()
+    return render(request, 'projects/project_form.html', {'form': form, 'is_admin': admin_user})
 
+
+@login_required
 def project_detail(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project.objects.select_related('customer', 'invoice'), pk=pk)
+    if not can_access_project(request.user, project):
+        return HttpResponseForbidden("You do not have permission to access this order.")
+
     windows = project.windows.all()
-    
+
     # Check if calculation and optimisation are done
     calculated_count = windows.filter(computed=True).count()
     all_calculated = windows.count() > 0 and calculated_count == windows.count()
     optimised = hasattr(project, 'optimisation_result')
-    
+    is_admin = is_admin_user(request.user)
+
+    invoice_form = None
+    auto_pricing = calculate_quotation_totals(project, tax_percent=18.0)
+    invoice_tax_percent = 18.0
+    if getattr(project, 'invoice', None):
+        invoice_tax_percent = project.invoice.tax_percent
+
+    if is_admin:
+        invoice = getattr(project, 'invoice', None)
+        invoice_form = InvoiceForm(instance=invoice)
+
     context = {
         'project': project,
         'windows': windows,
         'all_calculated': all_calculated,
-        'optimised': optimised
+        'optimised': optimised,
+        'is_admin': is_admin,
+        'invoice': getattr(project, 'invoice', None),
+        'invoice_form': invoice_form,
+        'auto_subtotal': auto_pricing['subtotal'],
+        'auto_tax_preview': round(auto_pricing['subtotal'] * (invoice_tax_percent / 100), 2),
+        'auto_total_preview': round(auto_pricing['subtotal'] + (auto_pricing['subtotal'] * (invoice_tax_percent / 100)), 2),
     }
     return render(request, 'projects/project_detail.html', context)
 
+
+@login_required
 def add_window(request, pk):
     project = get_object_or_404(Project, pk=pk)
+    if not can_access_project(request.user, project):
+        return HttpResponseForbidden("You do not have permission to edit this order.")
+    if is_admin_user(request.user):
+        messages.warning(request, "Admins should review requests. Window updates are customer-owned.")
+        return redirect('projects:detail', pk=project.pk)
+    if project.status not in [Project.STATUS_PENDING, Project.STATUS_REJECTED]:
+        messages.warning(request, "You can edit openings only while the request is pending or rejected.")
+        return redirect('projects:detail', pk=project.pk)
+
     if request.method == 'POST':
         form = WindowEntryForm(request.POST)
         if form.is_valid():
@@ -58,11 +109,16 @@ def add_window(request, pk):
         form = WindowEntryForm(initial={'item_code': next_code})
     return render(request, 'projects/window_form.html', {'form': form, 'project': project})
 
+
+@login_required
 def calculate_project(request, pk):
     if request.method == 'POST':
         project = get_object_or_404(Project, pk=pk)
+        if not can_access_project(request.user, project):
+            return HttpResponseForbidden("You do not have permission to calculate this order.")
+
         calculator = WindowCalculator()
-        
+
         success_count = 0
         errors = []
         for window in project.windows.filter(computed=False):
@@ -77,13 +133,17 @@ def calculate_project(request, pk):
                 messages.error(request, error)
         if success_count > 0:
             messages.success(request, f"Successfully calculated {success_count} windows.")
-            
+
     return redirect('projects:detail', pk=pk)
 
+
+@login_required
 def optimise_project(request, pk):
     if request.method == 'POST':
         project = get_object_or_404(Project, pk=pk)
-        
+        if not can_access_project(request.user, project):
+            return HttpResponseForbidden("You do not have permission to optimize this order.")
+
         # Gather all computed cut pieces
         cut_pieces = []
         for window in project.windows.filter(computed=True):
@@ -93,16 +153,16 @@ def optimise_project(request, pk):
                     'profile_name': piece.profile.name,
                     'piece_name': f"{window.item_code} - {piece.piece_name}",
                     'length': piece.length,
-                    'qty': piece.quantity * window.quantity
+                    'qty': piece.quantity * window.quantity,
                 })
-        
+
         if not cut_pieces:
             messages.warning(request, "No calculated cut pieces found for optimisation.")
             return redirect('projects:detail', pk=pk)
-            
+
         optimiser = BarOptimiser(bar_length=project.profile_system.standard_bar_length if project.profile_system else 6000)
         result_data = optimiser.optimise(cut_pieces)
-        
+
         # Save result
         OptimisationResult.objects.update_or_create(
             project=project,
@@ -110,8 +170,72 @@ def optimise_project(request, pk):
                 'total_bars_used': result_data.get('bars_used', 0),
                 'total_waste_mm': result_data.get('waste_mm', 0.0),
                 'overall_efficiency': 100.0 - result_data.get('waste_percent', 0.0), # Inverse
-                'result_data': result_data
-            }
+                'result_data': result_data,
+            },
         )
         messages.success(request, "Bar optimisation complete.")
+    return redirect('projects:detail', pk=pk)
+
+
+@login_required
+def accept_order(request, pk):
+    if request.method != 'POST':
+        return redirect('projects:detail', pk=pk)
+    if not is_admin_user(request.user):
+        return HttpResponseForbidden("Only admins can accept orders.")
+
+    project = get_object_or_404(Project, pk=pk)
+    project.status = Project.STATUS_ACCEPTED
+    project.accepted_by = request.user
+    project.accepted_at = timezone.now()
+    project.rejected_reason = ""
+    project.save(update_fields=['status', 'accepted_by', 'accepted_at', 'rejected_reason'])
+    messages.success(request, f"Order {project.project_code} accepted.")
+    return redirect('projects:detail', pk=pk)
+
+
+@login_required
+def reject_order(request, pk):
+    if request.method != 'POST':
+        return redirect('projects:detail', pk=pk)
+    if not is_admin_user(request.user):
+        return HttpResponseForbidden("Only admins can reject orders.")
+
+    project = get_object_or_404(Project, pk=pk)
+    reason = request.POST.get('rejected_reason', '').strip()
+    if not reason:
+        messages.error(request, "Rejection reason is required.")
+        return redirect('projects:detail', pk=pk)
+
+    project.status = Project.STATUS_REJECTED
+    project.rejected_reason = reason
+    project.accepted_by = None
+    project.accepted_at = None
+    project.save(update_fields=['status', 'rejected_reason', 'accepted_by', 'accepted_at'])
+    messages.success(request, f"Order {project.project_code} rejected.")
+    return redirect('projects:detail', pk=pk)
+
+
+@login_required
+def upsert_invoice(request, pk):
+    if request.method != 'POST':
+        return redirect('projects:detail', pk=pk)
+    if not is_admin_user(request.user):
+        return HttpResponseForbidden("Only admins can manage billing.")
+
+    project = get_object_or_404(Project, pk=pk)
+    invoice = getattr(project, 'invoice', None)
+    form = InvoiceForm(request.POST, instance=invoice)
+    if form.is_valid():
+        pricing = calculate_quotation_totals(project, tax_percent=18.0)
+        invoice = form.save(commit=False)
+        invoice.project = project
+        invoice.subtotal = pricing['subtotal']
+        invoice.tax_amount = round(invoice.subtotal * (invoice.tax_percent / 100), 2)
+        invoice.total = round(invoice.subtotal + invoice.tax_amount, 2)
+        invoice.generated_by = request.user
+        invoice.save()
+        messages.success(request, f"Invoice saved for {project.project_code}.")
+    else:
+        messages.error(request, "Invoice data is invalid. Please review fields.")
     return redirect('projects:detail', pk=pk)

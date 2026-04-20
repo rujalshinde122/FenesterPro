@@ -3,148 +3,84 @@
 {% block title %}Dashboard - FenesterPro{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-2">
-    
-    <!-- Left Column (KPI & Stats) -->
-    <div class="xl:col-span-2 space-y-8 flex flex-col">
-        <!-- Main Stats Card -->
-        <div class="bg-ui-surface rounded-4xl p-8 shadow-soft relative overflow-hidden flex flex-col">
-            <div class="absolute right-[-10%] top-[-10%] w-64 h-64 bg-twisty-500/5 rounded-full blur-3xl -z-10"></div>
-            
-            <div class="mb-8">
-                <h2 class="text-2xl font-extrabold text-ui-text tracking-tight mb-2">Workspace Overview</h2>
-                <p class="text-ui-muted text-sm font-medium">Real-time fabrication and project metrics.</p>
+<section class="mb-8">
+    {% if is_admin %}
+    <p class="text-xs uppercase tracking-[0.2em] text-brand-red font-extrabold">Admin Dashboard</p>
+    <h1 class="mt-2 text-3xl md:text-4xl font-extrabold tracking-tight">Review customer requests and manage fulfilment.</h1>
+    <p class="mt-3 text-ui-muted max-w-3xl">Accept or reject incoming orders, generate invoices, and keep delivery flow moving.</p>
+    {% else %}
+    <p class="text-xs uppercase tracking-[0.2em] text-brand-red font-extrabold">Customer Dashboard</p>
+    <h1 class="mt-2 text-3xl md:text-4xl font-extrabold tracking-tight">Track your requests, approvals, and billing status.</h1>
+    <p class="mt-3 text-ui-muted max-w-3xl">Create order requests, monitor status updates, and check invoice details from one place.</p>
+    {% endif %}
+</section>
+
+<section class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+    <div class="bg-white border border-black/10 p-6">
+        <p class="text-xs uppercase tracking-[0.16em] text-ui-muted font-bold">Total Projects</p>
+        <p class="mt-3 text-4xl font-extrabold">{{ total_projects }}</p>
+    </div>
+    <div class="bg-brand-mint border border-black/10 p-6">
+        <p class="text-xs uppercase tracking-[0.16em] text-ui-muted font-bold">Active In Progress</p>
+        <p class="mt-3 text-4xl font-extrabold">{{ active_projects }}</p>
+    </div>
+    <div class="bg-brand-sand border border-black/10 p-6">
+        {% if is_admin %}
+        <p class="text-xs uppercase tracking-[0.16em] text-ui-muted font-bold">Pending Approvals</p>
+        <p class="mt-3 text-4xl font-extrabold">{{ pending_approvals }}</p>
+        {% else %}
+        <p class="text-xs uppercase tracking-[0.16em] text-ui-muted font-bold">Windows Computed</p>
+        <p class="mt-3 text-4xl font-extrabold">{{ windows_calculated_month }}</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="xl:col-span-2 bg-white border border-black/10 p-6 md:p-8">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+            <div>
+                <h2 class="text-2xl font-extrabold">Material efficiency snapshot</h2>
+                <p class="text-sm text-ui-muted mt-1">Estimated profile savings based on computed entries.</p>
             </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div class="bg-slate-50 rounded-3xl p-6 border border-slate-100 flex flex-col justify-end">
-                    <div class="w-10 h-10 rounded-xl bg-white text-slate-800 flex items-center justify-center shadow-sm mb-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-4xl font-black text-ui-text mb-1">{{ total_projects }}</h3>
-                        <p class="text-xs font-bold text-ui-muted uppercase tracking-wider">Total Projects</p>
-                    </div>
-                </div>
-
-                <div class="bg-twisty-50 rounded-3xl p-6 border border-twisty-100 flex flex-col justify-end relative overflow-hidden group">
-                    <div class="w-10 h-10 rounded-xl bg-twisty-500 text-white flex items-center justify-center shadow-md shadow-twisty-500/30 mb-4 transition-transform group-hover:scale-110">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-4xl font-black text-twisty-600 mb-1">{{ active_projects }}</h3>
-                        <p class="text-xs font-bold text-twisty-600/70 uppercase tracking-wider">Active In-Progress</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 rounded-3xl p-6 border border-slate-100 flex flex-col justify-end">
-                    <div class="w-10 h-10 rounded-xl bg-white text-slate-800 flex items-center justify-center shadow-sm mb-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-4xl font-black text-ui-text mb-1">{{ windows_calculated_month }}</h3>
-                        <p class="text-xs font-bold text-ui-muted uppercase tracking-wider">Computed Units</p>
-                    </div>
-                </div>
-            </div>
+            <a href="{% url 'projects:new' %}" class="inline-flex w-fit px-5 py-3 bg-brand-red text-white text-sm font-bold hover:bg-[#b13227] transition-colors">Start New Project</a>
         </div>
-
-        <!-- Lower Grid / Information -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Optimization Efficiencies -->
-            <div class="bg-ui-surface rounded-4xl p-8 shadow-soft flex flex-col justify-between border border-ui-border">
-                <div class="mb-6">
-                    <h3 class="font-extrabold text-lg text-ui-text mb-1">Compute Efficiency</h3>
-                    <p class="text-ui-muted text-sm font-medium">System savings via algorithm</p>
-                </div>
-                
-                <div class="bg-slate-50 p-5 rounded-3xl border border-slate-100">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-12 h-12 rounded-full overflow-hidden bg-white shadow-sm flex items-center justify-center text-green-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div>
-                            <h4 class="font-black text-ui-text text-xl">{{ bars_saved }} Profiles</h4>
-                            <p class="text-xs font-bold tracking-wider uppercase text-ui-muted">Estimated Material Saved</p>
-                        </div>
-                    </div>
-                    <p class="text-xs text-ui-muted font-medium leading-relaxed">The First-Fit Decreasing algorithm actively groups cutting requests reducing raw 6m aluminium waste.</p>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="border border-black/10 p-5 bg-[#faf8f4]">
+                <p class="text-xs uppercase tracking-[0.16em] text-ui-muted font-bold">Profiles Saved</p>
+                <p class="mt-3 text-3xl font-extrabold">{{ bars_saved }}</p>
+                <p class="text-sm text-ui-muted mt-2">Reduced raw bar wastage through optimized cutting sequences.</p>
             </div>
-
-            <!-- Quick Action Start Project -->
-            <div class="bg-gradient-to-br from-ui-text to-slate-800 rounded-4xl p-8 shadow-soft relative overflow-hidden flex flex-col justify-center">
-                <div class="absolute right-[-20%] bottom-[-20%] w-64 h-64 bg-twisty-500/30 rounded-full blur-[80px]"></div>
-                <div>
-                    <h3 class="font-black text-2xl text-white mb-2 relative z-10 leading-tight">Start Computing New Layouts</h3>
-                    <p class="text-sm text-slate-300 font-medium leading-relaxed relative z-10">Add client dimensions and process intelligent cut lists with real-time optimization charting.</p>
-                </div>
-                <a href="{% url 'projects:new' %}" class="mt-8 w-fit py-3.5 px-6 bg-twisty-500 text-white font-bold text-sm rounded-full shadow-lg shadow-twisty-500/40 hover:bg-twisty-600 transition relative z-10 inline-flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
-                    Create Project
-                </a>
+            <div class="border border-black/10 p-5 bg-brand-ink text-white">
+                <p class="text-xs uppercase tracking-[0.16em] text-white/70 font-bold">Next Action</p>
+                {% if is_admin %}
+                <p class="mt-3 text-2xl font-extrabold leading-snug">Open pending orders, accept requests, and publish customer invoice.</p>
+                {% else %}
+                <p class="mt-3 text-2xl font-extrabold leading-snug">Create request, add windows, then track acceptance and invoice updates.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Right Column (Actual Recent Projects list) -->
-    <div class="bg-ui-surface rounded-4xl p-8 shadow-soft flex flex-col border border-ui-border h-full max-h-[800px]">
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h3 class="text-xl font-extrabold text-ui-text">Recent Orders</h3>
-                <p class="text-xs text-ui-muted font-medium mt-1">Latest system transactions</p>
-            </div>
-            <a href="{% url 'projects:list' %}" class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-ui-muted hover:bg-slate-100 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </a>
+    <div class="bg-white border border-black/10 p-6 md:p-7">
+        <div class="flex items-center justify-between mb-5">
+            <h2 class="text-xl font-extrabold">Recent Orders</h2>
+            <a href="{% url 'projects:list' %}" class="text-sm font-bold text-brand-red hover:text-[#b13227]">View All</a>
         </div>
 
-        <div class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+        <div class="space-y-3">
             {% for project in recent_projects %}
-            <a href="{% url 'projects:detail' project.pk %}" class="block group border border-slate-100 rounded-3xl p-4 hover:border-slate-200 hover:shadow-sm transition bg-white">
-                <div class="flex items-center gap-4">
-                    <!-- Project Avatar -->
-                    <div class="w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center font-black text-sm shadow-sm transition
-                        {% if project.status == 'completed' %}bg-slate-800 text-white
-                        {% elif project.status == 'confirmed' %}bg-green-100 text-green-700
-                        {% elif project.status == 'in_production' %}bg-twisty-100 text-twisty-600
-                        {% else %}bg-slate-100 text-slate-600{% endif %}">
-                        {{ project.project_code|slice:"4:6" }}
-                    </div>
-                    
-                    <div class="flex-1 min-w-0">
-                        <div class="flex flex-col mb-1">
-                            <span class="font-bold text-ui-text truncate leading-tight group-hover:text-twisty-500 transition">{{ project.client_name }}</span>
-                            <span class="text-xs text-ui-muted font-medium mb-1">{{ project.project_code }}</span>
-                        </div>
-                        
-                        <div class="flex items-center gap-2 mt-2">
-                            <span class="px-2.5 py-1 bg-slate-50 border border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-600 rounded-md">
-                                {{ project.get_status_display }}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="text-slate-300 group-hover:text-twisty-500 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </div>
-                </div>
+            <a href="{% url 'projects:detail' project.pk %}" class="block border border-black/10 p-4 hover:bg-[#fcfaf6] transition-colors">
+                <p class="font-bold leading-tight">{{ project.client_name }}</p>
+                <p class="text-xs uppercase tracking-[0.14em] text-ui-muted mt-1">{{ project.project_code }}</p>
+                <span class="inline-flex mt-3 text-xs font-bold px-2.5 py-1 border border-black/10 bg-white">{{ project.get_status_display }}</span>
             </a>
             {% empty %}
-            <div class="text-center py-10">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                </div>
-                <p class="text-sm font-bold text-ui-text">No Recent Projects</p>
-                <p class="text-xs text-ui-muted mt-1">There are no orders submitted.</p>
+            <div class="border border-dashed border-black/20 p-8 text-center">
+                <p class="font-bold">No projects yet</p>
+                <p class="text-sm text-ui-muted mt-1">Create your first project to see activity here.</p>
             </div>
             {% endfor %}
         </div>
     </div>
-</div>
-
-<style>
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-</style>
+</section>
 {% endblock %}
