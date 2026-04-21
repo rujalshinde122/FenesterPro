@@ -11,6 +11,15 @@ python manage.py migrate
 # Collect static files for production styling
 python manage.py collectstatic --no-input
 
+# Optional one-time cleanup of legacy rows (set PURGE_LEGACY_DATA=true)
+if [ "${PURGE_LEGACY_DATA:-false}" = "true" ]; then
+  if [ "${PURGE_KEEP_USERS:-false}" = "true" ]; then
+    python manage.py purge_legacy_data --yes --keep-users
+  else
+    python manage.py purge_legacy_data --yes
+  fi
+fi
+
 # (Optional) Seed demo catalog data only when explicitly enabled
 if [ "${SEED_DEMO_DATA:-false}" = "true" ]; then
   python manage.py seed_demo_data
