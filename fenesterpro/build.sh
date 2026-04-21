@@ -11,8 +11,10 @@ python manage.py migrate
 # Collect static files for production styling
 python manage.py collectstatic --no-input
 
-# (Optional) Seed the database with demo data if it's empty
-python manage.py seed_demo_data
+# (Optional) Seed demo catalog data only when explicitly enabled
+if [ "${SEED_DEMO_DATA:-false}" = "true" ]; then
+  python manage.py seed_demo_data
+fi
 
 # Create a superuser from environment variables (only if one doesn't exist)
 python manage.py shell -c "
