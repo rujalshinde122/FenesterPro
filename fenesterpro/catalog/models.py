@@ -19,6 +19,11 @@ class Profile(models.Model):
     system = models.ForeignKey(ProfileSystem, on_delete=models.CASCADE, related_name='profiles')
     code = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
+    optimisation_group = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Optional grouping key for interchangeable profiles during bar optimization."
+    )
     role = models.CharField(max_length=50, choices=[
         ('frame', 'Frame'),
         ('sash', 'Sash'),

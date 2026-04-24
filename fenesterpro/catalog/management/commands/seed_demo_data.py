@@ -33,24 +33,33 @@ class Command(BaseCommand):
 
         # 5. Profiles
         profiles_data = [
-            ("TF-01", "Top Frame", "frame", 0.9, 0.45),
-            ("BF-01", "Bottom Frame", "frame", 1.1, 0.50),
-            ("LF-01", "Left Frame", "frame", 0.9, 0.45),
-            ("RF-01", "Right Frame", "frame", 0.9, 0.45),
-            ("ST-01", "Sash Top", "sash", 0.7, 0.35),
-            ("SB-01", "Sash Bottom", "sash", 0.8, 0.40),
-            ("SL-01", "Sash Left", "sash", 0.7, 0.35),
-            ("SR-01", "Sash Right", "sash", 0.7, 0.35),
-            ("MT-01", "Middle Track", "mullion", 0.85, 0.42),
-            ("BD-01", "Bead", "bead", 0.2, 0.10)
+            ("TF-01", "Top Frame", "frame", 0.9, 0.45, "FRAME-STD"),
+            ("BF-01", "Bottom Frame", "frame", 1.1, 0.50, "FRAME-STD"),
+            ("LF-01", "Left Frame", "frame", 0.9, 0.45, "FRAME-STD"),
+            ("RF-01", "Right Frame", "frame", 0.9, 0.45, "FRAME-STD"),
+            ("ST-01", "Sash Top", "sash", 0.7, 0.35, "SASH-STD"),
+            ("SB-01", "Sash Bottom", "sash", 0.8, 0.40, "SASH-STD"),
+            ("SL-01", "Sash Left", "sash", 0.7, 0.35, "SASH-STD"),
+            ("SR-01", "Sash Right", "sash", 0.7, 0.35, "SASH-STD"),
+            ("MT-01", "Middle Track", "mullion", 0.85, 0.42, ""),
+            ("BD-01", "Bead", "bead", 0.2, 0.10, "BEAD-STD")
         ]
         
         profs = {}
-        for code, name, role, weight, cost in profiles_data:
+        for code, name, role, weight, cost, optimisation_group in profiles_data:
             p, _ = Profile.objects.get_or_create(
                 system=ps, code=code,
-                defaults={'name': name, 'role': role, 'unit_weight': weight, 'unit_cost': cost}
+                defaults={
+                    'name': name,
+                    'role': role,
+                    'unit_weight': weight,
+                    'unit_cost': cost,
+                    'optimisation_group': optimisation_group,
+                }
             )
+            if p.optimisation_group != optimisation_group:
+                p.optimisation_group = optimisation_group
+                p.save(update_fields=['optimisation_group'])
             profs[code] = p
 
         # 6. Typologies

@@ -144,24 +144,54 @@ def optimise_project(request, pk):
         if not can_access_project(request.user, project):
             return HttpResponseForbidden("You do not have permission to optimize this order.")
 
-        # Gather all computed cut pieces
-        cut_pieces = []
+        # Gather all computed cut pieces. We prepare both:
+        # 1) strict profile-code packing baseline
+        # 2) grouped packing (interchangeable profiles) for actual optimization
+        strict_cut_pieces = []
+        grouped_cut_pieces = []
+
+        def _group_label(profile):
+            if not profile.optimisation_group:
+                return profile.name
+            return f"{profile.get_role_display()} Group ({profile.optimisation_group})"
+
         for window in project.windows.filter(computed=True):
-            for piece in window.cut_pieces.all():
-                cut_pieces.append({
+            for piece in window.cut_pieces.select_related('profile'):
+                effective_qty = piece.quantity * window.quantity
+                strict_cut_pieces.append({
                     'profile_code': piece.profile.code,
                     'profile_name': piece.profile.name,
                     'piece_name': f"{window.item_code} - {piece.piece_name}",
                     'length': piece.length,
-                    'qty': piece.quantity * window.quantity,
+                    'qty': effective_qty,
                 })
 
-        if not cut_pieces:
+                grouped_profile_code = (piece.profile.optimisation_group or piece.profile.code).strip()
+                grouped_cut_pieces.append({
+                    'profile_code': grouped_profile_code,
+                    'profile_name': _group_label(piece.profile),
+                    'piece_name': f"{window.item_code} - {piece.piece_name} [{piece.profile.code}]",
+                    'length': piece.length,
+                    'qty': effective_qty,
+                })
+
+        if not grouped_cut_pieces:
             messages.warning(request, "No calculated cut pieces found for optimisation.")
             return redirect('projects:detail', pk=pk)
 
         optimiser = BarOptimiser(bar_length=project.profile_system.standard_bar_length if project.profile_system else 6000)
-        result_data = optimiser.optimise(cut_pieces)
+        baseline_data = optimiser.optimise(strict_cut_pieces)
+        result_data = optimiser.optimise(grouped_cut_pieces)
+        result_data['comparison'] = {
+            'baseline_bars_used': baseline_data.get('bars_used', 0),
+            'baseline_waste_mm': baseline_data.get('waste_mm', 0.0),
+            'baseline_waste_percent': baseline_data.get('waste_percent', 0.0),
+            'optimized_bars_used': result_data.get('bars_used', 0),
+            'optimized_waste_mm': result_data.get('waste_mm', 0.0),
+            'optimized_waste_percent': result_data.get('waste_percent', 0.0),
+            'bars_saved': baseline_data.get('bars_used', 0) - result_data.get('bars_used', 0),
+            'waste_saved_mm': baseline_data.get('waste_mm', 0.0) - result_data.get('waste_mm', 0.0),
+        }
 
         # Save result
         OptimisationResult.objects.update_or_create(
@@ -173,7 +203,11 @@ def optimise_project(request, pk):
                 'result_data': result_data,
             },
         )
-        messages.success(request, "Bar optimisation complete.")
+        comp = result_data['comparison']
+        messages.success(
+            request,
+            f"Bar optimisation complete. Saved {comp['bars_saved']} bars and {comp['waste_saved_mm']:.1f}mm waste vs strict profile-code packing."
+        )
     return redirect('projects:detail', pk=pk)
 
 

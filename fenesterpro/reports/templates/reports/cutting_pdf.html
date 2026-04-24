@@ -20,6 +20,23 @@
 <body>
     <h1>Optimised Bar Layout</h1>
     <p><strong>Project:</strong> {{ project.project_code }} | <strong>Standard Length:</strong> {{ bar_length }}mm</p>
+    {% if opt_result.comparison %}
+        <p>
+            <strong>Baseline (strict code):</strong>
+            {{ opt_result.comparison.baseline_bars_used }} bars,
+            {{ opt_result.comparison.baseline_waste_mm|floatformat:1 }}mm waste
+            ({{ opt_result.comparison.baseline_waste_percent|floatformat:2 }}%)
+            <br>
+            <strong>Optimized (grouped):</strong>
+            {{ opt_result.comparison.optimized_bars_used }} bars,
+            {{ opt_result.comparison.optimized_waste_mm|floatformat:1 }}mm waste
+            ({{ opt_result.comparison.optimized_waste_percent|floatformat:2 }}%)
+            <br>
+            <strong>Savings:</strong>
+            {{ opt_result.comparison.bars_saved }} bars,
+            {{ opt_result.comparison.waste_saved_mm|floatformat:1 }}mm
+        </p>
+    {% endif %}
     
     {% if opt_result %}
         {% for code, p_data in opt_result.profiles.items %}
